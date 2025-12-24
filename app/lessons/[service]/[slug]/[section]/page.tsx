@@ -9,6 +9,7 @@ import {
   getAllServices,
   getChaptersByService,
 } from '@/lib/lessons';
+import { FeedbackForm } from '@/components/feedback-form';
 
 interface SectionPageProps {
   params: Promise<{ service: string; slug: string; section: string }>;
@@ -208,38 +209,13 @@ export default async function SectionPage({ params }: SectionPageProps) {
             </ReactMarkdown>
           </article>
 
-          {/* 前後のセクションナビゲーション */}
-          <div className="flex justify-between items-center pt-8 border-t">
-            {prevSection ? (
-              <Link
-                href={`/lessons/${service}/${slug}/${prevSection.slug}`}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <div>
-                  <p className="text-xs text-muted-foreground">前のセクション</p>
-                  <p className="font-semibold">{prevSection.title}</p>
-                </div>
-              </Link>
-            ) : (
-              <div />
-            )}
-
-            {nextSection ? (
-              <Link
-                href={`/lessons/${service}/${slug}/${nextSection.slug}`}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-right"
-              >
-                <div>
-                  <p className="text-xs text-muted-foreground">次のセクション</p>
-                  <p className="font-semibold">{nextSection.title}</p>
-                </div>
-                <ArrowLeft className="h-4 w-4 rotate-180" />
-              </Link>
-            ) : (
-              <div />
-            )}
-          </div>
+          {/* 感想フォームとナビゲーション */}
+          <FeedbackForm
+            nextSection={nextSection}
+            prevSection={prevSection}
+            service={service}
+            chapterSlug={slug}
+          />
         </div>
       </div>
     </div>
