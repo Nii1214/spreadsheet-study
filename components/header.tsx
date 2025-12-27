@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Laptop } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Table } from 'lucide-react';
+import { AuthButton } from '@/components/auth-button';
 
 
 export const Header = () => {
@@ -26,17 +27,7 @@ export const Header = () => {
               料金
             </Link>
           </nav>
-          <div className="flex items-center space-x-2">
-            {/* shadcnのButton: variant="ghost" で背景なしのボタン */}
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">ログイン</Link>
-            </Button>
-            
-            {/* shadcnのButton: デフォルト（青系）のボタン */}
-            <Button size="sm" asChild>
-              <Link href="/signup">はじめる</Link>
-            </Button>
-          </div>
+          <AuthButton />
         </div>
 
       </div>
