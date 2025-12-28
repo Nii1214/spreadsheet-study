@@ -1,36 +1,34 @@
-import Link from 'next/link'
-import { Laptop } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Table } from 'lucide-react';
-import { AuthButton } from '@/components/auth-button';
+'use client';
 
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { HeaderLoggedIn } from '@/components/header-logged-in';
+import { HeaderLoggedOut } from '@/components/header-logged-out';
 
 export const Header = () => {
-  return (
-    // <header className="sticky top-0 z-50 w-full border-b bg-white">
-    <header className="h-16 bg-sheets text-white flex items-center px-6">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-2 group">
-            <div className="bg-sheets-pale p-1.5 rounded-md transition-colors group-hover:bg-white">
-                <Table className="h-5 w-5 text-sheets" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-                スプレッドシート勉強用サイト
-            </span>
-        </Link>
-        <div className="flex items-center space-x-6">
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <Link href="/features" className="text-white text-muted-foreground hover:text-primary transition-colors ">
-              機能
-            </Link>
-            <Link href="/pricing" className="text-white text-muted-foreground hover:text-primary transition-colors">
-              料金
-            </Link>
-          </nav>
-          <AuthButton />
-        </div>
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const supabase = createClient();
 
-      </div>
-    </header>
-  )
+  useEffect(() => {
+    // 現在のユーザーを取得
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
+
+    // 認証状態の変更を監視
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  // ローディング中はログアウト状態のヘッダーを表示
+  if (isLoggedIn === null) {
+    return <HeaderLoggedOut />;
+  }
+
+  return isLoggedIn ? <HeaderLoggedIn /> : <HeaderLoggedOut />;
 }
