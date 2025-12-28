@@ -33,8 +33,8 @@ export default function LoginPage() {
         return;
       }
 
-      // ログイン成功後、ホームページにリダイレクト
-      router.push('/');
+      // ログイン成功後、講座一覧にリダイレクト
+      router.push('/lessons');
       router.refresh();
     } catch (err) {
       setError('ログインに失敗しました');
