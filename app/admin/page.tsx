@@ -31,11 +31,11 @@ export default async function AdminPage() {
                   <Layers className="h-6 w-6 text-sheets" />
                 </div>
                 <h2 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                  サービス管理
+                  講座管理
                 </h2>
               </div>
               <p className="text-sm text-muted-foreground">
-                サービスの作成・編集・削除を行います
+                講座の作成・編集・削除を行います
               </p>
             </div>
           </Link>
