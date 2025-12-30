@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { isAdmin } from '@/lib/supabase/profile';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default async function ServicesPage() {
@@ -13,10 +13,26 @@ export default async function ServicesPage() {
   }
 
   const supabase = await createClient();
-  const { data: services, error } = await supabase
+  const { data: allServices, error } = await supabase
     .from('services')
     .select('*')
-    .order('slug', { ascending: true });
+    .order('slug', { ascending: true })
+    .order('version', { ascending: false });
+
+  // 同じslugの最新バージョンのみを取得
+  const services = allServices
+    ? Array.from(
+      allServices
+        .reduce((map, service) => {
+          const key = service.slug;
+          if (!map.has(key) || map.get(key)!.version < service.version) {
+            map.set(key, service);
+          }
+          return map;
+        }, new Map<string, any>())
+        .values()
+    ).sort((a: any, b: any) => a.slug.localeCompare(b.slug))
+    : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +46,7 @@ export default async function ServicesPage() {
               <ArrowLeft className="h-4 w-4" />
               管理者画面に戻る
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight">サービス管理</h1>
+            <h1 className="text-3xl font-bold tracking-tight">講座管理</h1>
           </div>
           <Button asChild>
             <Link href="/admin/services/new">
@@ -49,30 +65,27 @@ export default async function ServicesPage() {
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold">スラッグ</th>
-                  <th className="px-4 py-3 text-left font-semibold">表示名</th>
-                  <th className="px-4 py-3 text-left font-semibold">作成日時</th>
-                  <th className="px-4 py-3 text-right font-semibold">操作</th>
+                  <th className="px-4 py-2 text-left font-semibold">スラッグ</th>
+                  <th className="px-4 py-2 text-left font-semibold">タイトル</th>
+                  <th className="px-4 py-2 text-left font-semibold">作成日時</th>
+                  <th className="px-4 py-2 text-right font-semibold"></th>
                 </tr>
               </thead>
               <tbody>
                 {services && services.length > 0 ? (
                   services.map((service: any) => (
                     <tr key={service.id} className="border-t">
-                      <td className="px-4 py-3">{service.slug}</td>
-                      <td className="px-4 py-3">{service.display_name}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                      <td className="px-4 py-2">{service.slug}</td>
+                      <td className="px-4 py-2">{service.title}</td>
+                      <td className="px-4 py-2 text-sm text-muted-foreground">
                         {new Date(service.created_at).toLocaleString('ja-JP')}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
+                      <td className="px-4 py-2">
+                        <div className="flex items-center justify-end">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/admin/services/${service.id}/edit`}>
                               <Edit className="h-4 w-4" />
                             </Link>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-destructive">
-                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>
